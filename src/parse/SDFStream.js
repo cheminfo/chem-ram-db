@@ -11,18 +11,26 @@ class SDFStream extends Transform {
 
     _transform(chunk, encoding, callback) {
         const str = chunk.toString();
-        const delimiterIndex = str.lastIndexOf('$$$$');
+        const delimiterIndex = str.lastIndexOf('$$$$\n');
         if (~delimiterIndex) {
-            this._buffer += str.slice(0, delimiterIndex);
+            this._buffer += str.slice(0, delimiterIndex + 5);
 
-            const parsed = sdfParser(this._buffer);
+            const parsed = sdfParser(this._buffer.replace(/\r/g,''));
             for (let i = 0; i < parsed.molecules.length; i++) {
                 this.push(parsed.molecules[i]);
             }
 
-            this._buffer = str.slice(delimiterIndex + 4);
+            this._buffer = str.slice(delimiterIndex + 5);
         } else {
             this._buffer += str;
+        }
+        callback();
+    }
+
+    _flush(callback) {
+        const parsed = sdfParser(this._buffer);
+        for (let i = 0; i < parsed.molecules.length; i++) {
+            this.push(parsed.molecules[i]);
         }
         callback();
     }

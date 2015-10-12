@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/cheminfo/chem-ram-db#readme",
   "dependencies": {
-    "sdf-parser": "^1.0.0",
+    "sdf-parser": "^1.0.0"
   }
 }
