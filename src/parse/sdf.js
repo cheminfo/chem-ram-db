@@ -3,7 +3,7 @@
 const CRD_VERSION = require('../CRD').VERSION;
 
 const sdfStream = require('./SDFStream');
-const OutputBuffer = require('iobuffer').OutputBuffer;
+const IOBuffer = require('iobuffer');
 const Molecule = require('openchemlib').Molecule;
 
 module.exports = function parseSDF(stream, options) {
@@ -16,7 +16,7 @@ module.exports = function parseSDF(stream, options) {
             };
         }
         const tsv = [];
-        const crd = new OutputBuffer(250*1024*1024); // todo wait for a fix of https://github.com/image-js/iobuffer/issues/5
+        const crd = new IOBuffer();
         crd.writeUint16(CRD_VERSION);
         crd.skip(4); // we will put the size here but it is currently unknown
         let total = 0;

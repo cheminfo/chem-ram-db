@@ -1,12 +1,12 @@
 'use strict';
 
 const CRD = require('./CRD');
-const InputBuffer = require('iobuffer').InputBuffer;
+const IOBuffer = require('iobuffer');
 
 module.exports = readCRD;
 
 function readCRD(data) {
-    const buffer = new InputBuffer(data);
+    const buffer = new IOBuffer(data);
     const version = buffer.readUint16();
     if (version !== CRD.VERSION) {
         throw new Error(`unsupported CRD version: ${version}. Current version is ${CRD.VERSION}`);
