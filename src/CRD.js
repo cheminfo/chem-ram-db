@@ -35,7 +35,7 @@ CRD.prototype.reset = function () {
     }
 };
 
-CRD.prototype.search = function (numberCrit) {
+CRD.prototype.search = function (numberCrit, molCrit) {
     this.reset();
     for (var i = 0; i < this.length; i++) {
         for (var j = 0; j < numberCrit.length; j++) {
@@ -46,16 +46,41 @@ CRD.prototype.search = function (numberCrit) {
         }
     }
 
+    if (molCrit) {
+        switch (molCrit.mode.toLowerCase()) {
+            case 'exact':
+                this.exactSearch(molCrit.query);
+                break;
+            case 'substructure':
+                this.substructureSearch(molCrit.query);
+                break;
+            case 'similarity':
+                this.similaritySearch(molCrit.query);
+                break;
+            default:
+                throw new Error('unknown search mode: ' + molCrit.mode);
+        }
+    }
+
     this.molecules.sort(sortBySimilarity);
     this.sorted = false;
 
-    var result = [];
+    //var result = [];
+    //for (var i = 0; i < this.length; i++) {
+    //    if (this.molecules[i].sim !== 0) {
+    //        result.push(this.molecules[i]);
+    //    }
+    //}
+    //return result;
+};
+
+CRD.prototype.exactSearch = function (query) {
+    const oclid = query.getIDCode();
     for (var i = 0; i < this.length; i++) {
-        if (this.molecules[i].sim !== 0) {
-            result.push(this.molecules[i]);
+        if (this.molecules[i].sim !== 0 && this.molecules[i].oclid !== oclid) {
+            this.molecules[i].sim = 0;
         }
     }
-    return result;
 };
 
 function Molecule(id, mw, oclid, sortid) {
