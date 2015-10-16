@@ -164,7 +164,7 @@ CRD.prototype.similaritySearch = function (query, limit) {
             sim = 1e6 * (1 - (sharedKeys / allKeys));
         }
 
-        this.molecules[i].dist = (Math.abs(mw, this.molecules[i].mw) + sim);
+        this.molecules[i].dist = (Math.abs(mw - this.molecules[i].mw) + sim);
     }
 };
 
