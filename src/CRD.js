@@ -69,10 +69,10 @@ CRD.prototype.search = function (numberCrit, molCrit) {
             default:
                 throw new Error('unknown search mode: ' + molCrit.mode);
         }
-    } else {
-        this.molecules.sort(sortByDistance);
-        this.sorted = false;
     }
+
+    this.molecules.sort(sortByDistance);
+    this.sorted = false;
 };
 
 CRD.prototype.exactSearch = function (query, limit) {
@@ -130,7 +130,6 @@ CRD.prototype.substructureSearch = function (query, limit) {
             found++;
         }
     }
-    this.molecules.sort(sortByDistance);
 
     if (needReset) {
         query.setFragment(false);
@@ -167,7 +166,6 @@ CRD.prototype.similaritySearch = function (query, limit) {
 
         this.molecules[i].dist = (Math.abs(mw, this.molecules[i].mw) + sim);
     }
-    this.molecules.sort(sortByDistance);
 };
 
 function Molecule(id, mw, oclid, sortid) {
