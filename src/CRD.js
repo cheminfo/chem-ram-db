@@ -5,6 +5,7 @@ const SSSearcher = OCL.SSSearcher;
 const OCLMolecule = OCL.Molecule;
 
 const VERSION = 1;
+const MAX_VALUE = 0xffffffff;
 
 module.exports = CRD;
 module.exports.VERSION = VERSION;
@@ -35,7 +36,7 @@ CRD.prototype.reset = function () {
         this.sorted = true;
     }
     for (var i = 0; i < this.length; i++) {
-        this.molecules[i].sim = 1;
+        this.molecules[i].dist = 0;
     }
 };
 
@@ -46,7 +47,7 @@ CRD.prototype.search = function (numberCrit, molCrit) {
         for (var i = 0; i < this.length; i++) {
             for (var j = 0; j < numberCrit.length; j++) {
                 if (!numberCrit[j].match(this[numberCrit[j].field][i])) {
-                    this.molecules[i].sim = 0;
+                    this.molecules[i].dist = MAX_VALUE;
                     break;
                 }
             }
@@ -54,81 +55,95 @@ CRD.prototype.search = function (numberCrit, molCrit) {
     }
 
     if (molCrit) {
+        const limit = molCrit.limit || 1000;
         switch (molCrit.mode.toLowerCase()) {
             case 'exact':
-                this.exactSearch(molCrit.query);
+                this.exactSearch(molCrit.query, limit);
                 break;
             case 'substructure':
-                this.substructureSearch(molCrit.query);
+                this.substructureSearch(molCrit.query, limit);
                 break;
             case 'similarity':
-                this.similaritySearch(molCrit.query);
+                this.similaritySearch(molCrit.query, limit);
                 break;
             default:
                 throw new Error('unknown search mode: ' + molCrit.mode);
         }
+    } else {
+        this.molecules.sort(sortBySimilarity);
+        this.sorted = false;
     }
-
-    this.molecules.sort(sortBySimilarity);
-    this.sorted = false;
-
-    //var result = [];
-    //for (var i = 0; i < this.length; i++) {
-    //    if (this.molecules[i].sim !== 0) {
-    //        result.push(this.molecules[i]);
-    //    }
-    //}
-    //return result;
 };
 
-CRD.prototype.exactSearch = function (query) {
+CRD.prototype.exactSearch = function (query, limit) {
     const oclid = query.getIDCode();
     for (var i = 0; i < this.length; i++) {
-        if (this.molecules[i].sim !== 0 && this.molecules[i].oclid !== oclid) {
-            this.molecules[i].sim = 0;
+        if (this.molecules[i].dist !== MAX_VALUE && this.molecules[i].oclid !== oclid) {
+            this.molecules[i].dist = MAX_VALUE;
         }
     }
 };
 
 let searcher;
-CRD.prototype.substructureSearch = function (query) {
+CRD.prototype.substructureSearch = function (query, limit) {
     if (!searcher) {
         searcher = new SSSearcher();
     }
     let needReset = false;
+    let mw;
     if (!query.isFragment()) {
+        mw = query.getMolecularFormula().getRelativeWeight();
         needReset = true;
+        query.setFragment(true);
+    } else {
+        query.setFragment(false);
+        mw = query.getMolecularFormula().getRelativeWeight();
         query.setFragment(true);
     }
     searcher.setFragment(query);
+
     const index = query.getIndex();
-    const mw = query.getMolecularFormula().getRelativeWeight();
     mol: for (var i = 0; i < this.length; i++) {
-        if (this.molecules[i].sim !== 0) {
+        if (this.molecules[i].dist !== MAX_VALUE) {
             // first verify the index
             for (var j = 0; j < 16; j++) {
                 if ((index[j]&this.index[i * 16 + j]) !== index[j]) {
-                    this.molecules[i].sim = 0;
+                    this.molecules[i].dist = MAX_VALUE;
                     continue mol;
                 }
             }
-            // actual SSS
-            searcher.setMolecule(OCLMolecule.fromIDCode(this.molecules[i].oclid));
-            if (searcher.isFragmentInMolecule()) {
-                this.molecules[i].sim = Math.abs(this.molecules[i].mw - mw);
-            } else {
-                this.molecules[i].sim = 0;
-            }
+            this.molecules[i].dist = Math.abs(this.molecules[i].mw - mw);
         }
     }
+    this.molecules.sort(sortByDistance);
+
+    var found = 0;
+    for (var i = 0; i < this.length; i++) {
+        if (this.molecules[i].dist === MAX_VALUE || found === limit) {
+            break;
+        }
+        // actual SSS
+        searcher.setMolecule(OCLMolecule.fromIDCode(this.molecules[i].oclid));
+        if (!searcher.isFragmentInMolecule()) {
+            this.molecules[i].dist = MAX_VALUE;
+        } else {
+            found++;
+        }
+    }
+    this.molecules.sort(sortByDistance);
+
     if (needReset) {
         query.setFragment(false);
     }
 };
 
+CRD.prototype.similaritySearch = function (query, limit) {
+
+};
+
 function Molecule(id, mw, oclid, sortid) {
     this.id = id;
-    this.sim = 1;
+    this.dist = 0;
     this.mw = mw;
     this.oclid = oclid;
     this.sortid = sortid;
@@ -139,5 +154,9 @@ function sortById(mol1, mol2) {
 }
 
 function sortBySimilarity(mol1, mol2) {
-    return mol2.sim - mol1.sim;
+    return mol2.dist - mol1.dist;
+}
+
+function sortByDistance(mol1, mol2) {
+    return mol1.dist - mol2.dist;
 }
