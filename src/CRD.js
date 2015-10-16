@@ -70,7 +70,7 @@ CRD.prototype.search = function (numberCrit, molCrit) {
                 throw new Error('unknown search mode: ' + molCrit.mode);
         }
     } else {
-        this.molecules.sort(sortBySimilarity);
+        this.molecules.sort(sortByDistance);
         this.sorted = false;
     }
 };
@@ -138,7 +138,36 @@ CRD.prototype.substructureSearch = function (query, limit) {
 };
 
 CRD.prototype.similaritySearch = function (query, limit) {
+    let mw;
+    if (query.isFragment()) {
+        query.setFragment(false);
+        mw = query.getMolecularFormula().getRelativeWeight();
+        query.setFragment(true);
+    } else {
+        mw = query.getMolecularFormula().getRelativeWeight();
+    }
+    const index = query.getIndex();
+    const oclid = query.getIDCode();
 
+    var sim, sharedKeys, allKeys;
+    for (var i = 0; i < this.length; i++) {
+        if (this.molecules[i].dist === MAX_VALUE) {
+            continue;
+        } else if (this.molecules[i].oclid === oclid) {
+            sim = 1e6;
+        } else {
+            sharedKeys = 0;
+            allKeys = 0;
+            for (var j = 0; j < 16; j++) {
+                sharedKeys += bitCount(this.index[i * 16 + j]&index[j]);
+                allKeys += bitCount(this.index[i * 16 + j]|index[j]);
+            }
+            sim = 1e6 * (1 - (sharedKeys / allKeys));
+        }
+
+        this.molecules[i].dist = (Math.abs(mw, this.molecules[i].mw) + sim);
+    }
+    this.molecules.sort(sortByDistance);
 };
 
 function Molecule(id, mw, oclid, sortid) {
@@ -153,10 +182,18 @@ function sortById(mol1, mol2) {
     return mol2.sortid - mol1.sortid;
 }
 
-function sortBySimilarity(mol1, mol2) {
-    return mol2.dist - mol1.dist;
-}
-
 function sortByDistance(mol1, mol2) {
     return mol1.dist - mol2.dist;
+}
+
+function bitCount(x) {
+    var temp = 0x55555555;
+    x = (x & temp) + (x >>> 1 & temp);
+    temp = 0x33333333;
+    x = (x & temp) + (x >>> 2 & temp);
+    temp = 0x07070707;
+    x = (x & temp) + (x >>> 4 & temp);
+    temp = 0x000F000F;
+    x = (x & temp) + (x >>> 8 & temp);
+    return (x & 0x1F) + (x >>> 16);
 }

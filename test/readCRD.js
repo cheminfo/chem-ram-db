@@ -5,11 +5,15 @@ const readCRD = require('..').readCRD;
 const comp = require('..').comparators;
 const Molecule = require('openchemlib').Molecule;
 
-const data = fs.readFileSync('data/chembl_20_mini.crd');
+const data = fs.readFileSync('data/chembl_20.crd');
+
+console.log(process.memoryUsage());
 
 console.time('load');
 var crd = readCRD(data);
 console.timeEnd('load');
+
+console.log(process.memoryUsage());
 
 console.log('length', crd.length);
 
@@ -26,8 +30,10 @@ var numSearch = [
 
 console.time('search');
 crd.search(null, {
-    mode: 'substructure',
+    mode: 'similarity',
     query: Molecule.fromSmiles('c1ccccc1'),
-    limit: 5
+    limit: 1000
 });
 console.timeEnd('search');
+
+console.log(crd.molecules[0]);
