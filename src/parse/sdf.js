@@ -1,6 +1,6 @@
 'use strict';
 
-const CRD_VERSION = 1;
+const CRD_VERSION = require('../CRD').VERSION;
 
 const sdfStream = require('./SDFStream');
 const OutputBuffer = require('iobuffer').OutputBuffer;
@@ -16,7 +16,7 @@ module.exports = function parseSDF(stream, options) {
             };
         }
         const tsv = [];
-        const crd = new OutputBuffer();
+        const crd = new OutputBuffer(250*1024*1024); // todo wait for a fix of https://github.com/image-js/iobuffer/issues/5
         crd.writeUint16(CRD_VERSION);
         crd.skip(4); // we will put the size here but it is currently unknown
         let total = 0;
@@ -32,7 +32,7 @@ module.exports = function parseSDF(stream, options) {
             crd.writeChars(oclid);
             // Index
             const index = molecule.getIndex();
-            for (let i = 0; i < 16; i++) {
+            for (var i = 0; i < 16; i++) {
                 crd.writeUint32(index[i]);
             }
             // MF

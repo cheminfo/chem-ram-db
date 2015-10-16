@@ -16,7 +16,7 @@ class SDFStream extends Transform {
             this._buffer += str.slice(0, delimiterIndex + 5);
 
             const parsed = sdfParser(this._buffer.replace(/\r/g,''));
-            for (let i = 0; i < parsed.molecules.length; i++) {
+            for (var i = 0; i < parsed.molecules.length; i++) {
                 this.push(parsed.molecules[i]);
             }
 
@@ -29,7 +29,7 @@ class SDFStream extends Transform {
 
     _flush(callback) {
         const parsed = sdfParser(this._buffer);
-        for (let i = 0; i < parsed.molecules.length; i++) {
+        for (var i = 0; i < parsed.molecules.length; i++) {
             this.push(parsed.molecules[i]);
         }
         callback();
