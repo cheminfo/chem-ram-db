@@ -1,5 +1,9 @@
 'use strict';
 
+const OCL = require('openchemlib');
+const SSSearcher = OCL.SSSearcher;
+const OCLMolecule = OCL.Molecule;
+
 const VERSION = 1;
 
 module.exports = CRD;
@@ -37,11 +41,14 @@ CRD.prototype.reset = function () {
 
 CRD.prototype.search = function (numberCrit, molCrit) {
     this.reset();
-    for (var i = 0; i < this.length; i++) {
-        for (var j = 0; j < numberCrit.length; j++) {
-            if(!numberCrit[j].match(this[numberCrit[j].field][i])) {
-                this.molecules[i].sim = 0;
-                break;
+
+    if (numberCrit) {
+        for (var i = 0; i < this.length; i++) {
+            for (var j = 0; j < numberCrit.length; j++) {
+                if (!numberCrit[j].match(this[numberCrit[j].field][i])) {
+                    this.molecules[i].sim = 0;
+                    break;
+                }
             }
         }
     }
@@ -80,6 +87,42 @@ CRD.prototype.exactSearch = function (query) {
         if (this.molecules[i].sim !== 0 && this.molecules[i].oclid !== oclid) {
             this.molecules[i].sim = 0;
         }
+    }
+};
+
+let searcher;
+CRD.prototype.substructureSearch = function (query) {
+    if (!searcher) {
+        searcher = new SSSearcher();
+    }
+    let needReset = false;
+    if (!query.isFragment()) {
+        needReset = true;
+        query.setFragment(true);
+    }
+    searcher.setFragment(query);
+    const index = query.getIndex();
+    const mw = query.getMolecularFormula().getRelativeWeight();
+    mol: for (var i = 0; i < this.length; i++) {
+        if (this.molecules[i].sim !== 0) {
+            // first verify the index
+            for (var j = 0; j < 16; j++) {
+                if ((index[j]&this.index[i * 16 + j]) !== index[j]) {
+                    this.molecules[i].sim = 0;
+                    continue mol;
+                }
+            }
+            // actual SSS
+            searcher.setMolecule(OCLMolecule.fromIDCode(this.molecules[i].oclid));
+            if (searcher.isFragmentInMolecule()) {
+                this.molecules[i].sim = Math.abs(this.molecules[i].mw - mw);
+            } else {
+                this.molecules[i].sim = 0;
+            }
+        }
+    }
+    if (needReset) {
+        query.setFragment(false);
     }
 };
 

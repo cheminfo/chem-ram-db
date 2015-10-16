@@ -24,8 +24,8 @@ var result = crd.search([
         match: comp.lte(120)
     }
 ], {
-    mode: 'exact',
-    query: Molecule.fromIDCode('enYXF@@C@DIMBclbbTTTtRVbbbTrJRvfRRjzV^IYZjjfjhFjBh``bBcADJaAKj@@')
+    mode: 'substructure',
+    query: Molecule.fromSmiles('CCCOCC')
 });
 console.log(crd.molecules[1]);
 //console.log(res.length);
