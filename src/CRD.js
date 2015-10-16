@@ -177,7 +177,7 @@ function Molecule(id, mw, oclid, sortid) {
 }
 
 function sortById(mol1, mol2) {
-    return mol2.sortid - mol1.sortid;
+    return mol1.sortid - mol2.sortid;
 }
 
 function sortByDistance(mol1, mol2) {
