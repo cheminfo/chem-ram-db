@@ -8,6 +8,7 @@ const Molecule = require('openchemlib').Molecule;
 
 module.exports = function parseSDF(stream, options) {
     return new Promise((resolve, reject) => {
+        let wantTSV = !!options.tsv;
         let id = options.id;
         let getID = id;
         if (typeof id === 'string') {
@@ -26,7 +27,7 @@ module.exports = function parseSDF(stream, options) {
             const id = getID(mol);
             const molecule = Molecule.fromMolfile(mol.molfile.value);
             const oclid = molecule.getIDCode();
-            tsv.push(oclid + '\t' + id);
+            if (wantTSV) tsv.push(oclid + '\t' + id);
             crd.writeUint32(id);
             crd.writeUint16(oclid.length);
             crd.writeChars(oclid);
