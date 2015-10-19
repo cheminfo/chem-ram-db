@@ -153,7 +153,7 @@ CRD.prototype.similaritySearch = function (query, limit) {
         if (this.molecules[i].dist === MAX_VALUE) {
             continue;
         } else if (this.molecules[i].oclid === oclid) {
-            sim = 1e6;
+            sim = 0;
         } else {
             sharedKeys = 0;
             allKeys = 0;
