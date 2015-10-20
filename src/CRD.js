@@ -1,5 +1,6 @@
 'use strict';
 
+const sort = require('timsort').sort;
 const OCL = require('openchemlib');
 const SSSearcher = OCL.SSSearcher;
 const OCLMolecule = OCL.Molecule;
@@ -32,7 +33,7 @@ CRD.prototype.setMol = function (id, mw, oclid, sortid) {
 
 CRD.prototype.reset = function () {
     if (!this.sorted) {
-        this.molecules.sort(sortById);
+        sort(this.molecules, sortById);
         this.sorted = true;
     }
     for (var i = 0; i < this.length; i++) {
@@ -71,7 +72,7 @@ CRD.prototype.search = function (numberCrit, molCrit) {
         }
     }
 
-    this.molecules.sort(sortByDistance);
+    sort(this.molecules, sortByDistance);
     this.sorted = false;
 };
 
@@ -115,7 +116,7 @@ CRD.prototype.substructureSearch = function (query, limit) {
             this.molecules[i].dist = Math.abs(this.molecules[i].mw - mw);
         }
     }
-    this.molecules.sort(sortByDistance);
+    sort(this.molecules, sortByDistance);
 
     var found = 0;
     for (var i = 0; i < this.length; i++) {
