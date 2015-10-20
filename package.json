@@ -23,7 +23,7 @@
   "dependencies": {
     "commander": "^2.9.0",
     "iobuffer": "^2.0.0-1",
-    "openchemlib": "^3.0.0",
+    "openchemlib": "^3.0.1",
     "sdf-parser": "^1.0.0"
   },
   "devDependencies": {
