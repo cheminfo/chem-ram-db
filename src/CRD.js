@@ -97,9 +97,7 @@ CRD.prototype.substructureSearch = function (query, limit) {
         needReset = true;
         query.setFragment(true);
     } else {
-        query.setFragment(false);
-        mw = query.getMolecularFormula().getRelativeWeight();
-        query.setFragment(true);
+        mw = getMW(query);
     }
     searcher.setFragment(query);
 
@@ -140,9 +138,7 @@ CRD.prototype.substructureSearch = function (query, limit) {
 CRD.prototype.similaritySearch = function (query, limit) {
     let mw;
     if (query.isFragment()) {
-        query.setFragment(false);
-        mw = query.getMolecularFormula().getRelativeWeight();
-        query.setFragment(true);
+        mw = getMW(query);
     } else {
         mw = query.getMolecularFormula().getRelativeWeight();
     }
@@ -195,4 +191,11 @@ function bitCount(x) {
     temp = 0x000F000F;
     x = (x & temp) + (x >>> 8 & temp);
     return (x & 0x1F) + (x >>> 16);
+}
+
+function getMW(query) {
+    // use a copy because setFragment(false) is not reversible (see https://github.com/Actelion/openchemlib/issues/4)
+    let copy = OCLMolecule.fromIDCode(query.getIDCode());
+    copy.setFragment(false);
+    return copy.getMolecularFormula().getRelativeWeight();
 }
