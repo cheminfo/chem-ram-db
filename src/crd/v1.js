@@ -2,6 +2,8 @@
 
 const CRDB = require('../crdb');
 
+exports.VERSION = 1;
+
 exports.read = function (buffer) {
     const dataLength = buffer.readUint32();
     const crd = new CRDB(dataLength);

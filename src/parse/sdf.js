@@ -1,6 +1,6 @@
 'use strict';
 
-const CRD_VERSION = require('../crd/latest').VERSION;
+const CRD_VERSION = require('../crd/v1').VERSION;
 
 const sdfStream = require('./SDFStream');
 const IOBuffer = require('iobuffer');
