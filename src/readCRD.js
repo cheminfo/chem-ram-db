@@ -1,6 +1,5 @@
 'use strict';
 
-const CRD = require('./CRD');
 const IOBuffer = require('iobuffer');
 
 module.exports = readCRD;
@@ -8,9 +7,15 @@ module.exports = readCRD;
 function readCRD(data) {
     const buffer = new IOBuffer(data);
     const version = buffer.readUint16();
-    if (version !== CRD.VERSION) {
-        throw new Error(`unsupported CRD version: ${version}. Current version is ${CRD.VERSION}`);
-    }
+
+    const CRD = (() => {
+        try {
+            return require(`./crd/v${version}`);
+        } catch (e) {
+            throw new Error(`could not find CRD version ${version}`);
+        }
+    })();
+
     const dataLength = buffer.readUint32();
     const crd = new CRD(dataLength);
     for (var i = 0; i < dataLength; i++) {
