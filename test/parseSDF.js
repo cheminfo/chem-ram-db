@@ -16,7 +16,7 @@ parseSDF(stream, {
         }
     ]
 }).then(function (result) {
-    fs.writeFileSync('data/chembl_20_nano.crd', new Buffer(result.crd))
+    fs.writeFileSync('data/chembl_20_nano.crd', result)
 }, function (err) {
     console.log('error:', err);
 });
