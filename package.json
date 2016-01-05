@@ -1,6 +1,6 @@
 {
   "name": "crdb",
-  "version": "1.0.0-3",
+  "version": "1.0.0-4",
   "description": "crdb",
   "main": "src/index.js",
   "scripts": {
