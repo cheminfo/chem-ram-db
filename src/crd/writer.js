@@ -157,7 +157,10 @@ function validateFields(fields) {
         if (typeof field.type === 'number') {
             field.type = types.list[field.type];
         }
-        if (typeof field.length !== 'number' || field.length < 0 || field.length > 255) {
+        if (typeof field.length !== 'number') {
+            field.length = 1;
+        }
+        if (field.length < 0 || field.length > 255) {
             throw new Error('field length must be a number in the range 0-255');
         }
         if (typeof field.name !== 'string') {
