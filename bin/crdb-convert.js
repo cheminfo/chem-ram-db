@@ -23,8 +23,8 @@ if (process.stdin.isTTY) {
 }
 
 let outputStream;
-if (process.output) {
-    fs.createWriteStream(process.output);
+if (program.output) {
+    outputStream = fs.createWriteStream(program.output);
 } else {
     outputStream = process.stdout;
 }
