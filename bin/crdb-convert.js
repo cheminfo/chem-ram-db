@@ -31,7 +31,7 @@ if (process.output) {
 
 let config;
 if (program.config) {
-    config = require(program.config);
+    config = require(require('path').resolve(program.config));
 }
 
 CRDB.parseSDF(inputStream, config).then(function (data) {
