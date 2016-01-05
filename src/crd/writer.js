@@ -1,6 +1,7 @@
 'use strict';
 
 const IOBuffer = require('iobuffer');
+const types = require('./types');
 const defaultFields = require('./writerDefaultFields');
 
 const VERSION = require('./v2').VERSION;
@@ -24,6 +25,8 @@ class CrdWriter extends IOBuffer {
             fields = fields.concat(defaultFields);
         }
 
+        validateFields(fields);
+
         this.fields = fields;
 
         this.writeUint16(VERSION); // binary format version
@@ -39,7 +42,7 @@ class CrdWriter extends IOBuffer {
     }
 
     writeFieldDefinition(field) {
-        this.writeUint32(field.type);
+        this.writeUint8(field.type);
         this.writeUint8(field.length);
         this.writeUint8(field.name.length);
         this.writeChars(field.name);
@@ -47,3 +50,18 @@ class CrdWriter extends IOBuffer {
 }
 
 module.exports = CrdWriter;
+
+function validateFields(fields) {
+    for (var i = 0; i < fields.length; i++) {
+        const field = fields[i];
+        if (!types.exists(field.type)) {
+            throw new Error(`field type ${field.type} does not exist`);
+        }
+        if (typeof field.length !== 'number' || field.length < 0 || field.length > 255) {
+            throw new Error('field length must be a number in the range 0-255');
+        }
+        if (typeof field.name !== 'string') {
+            throw new Error('field name must be a string');
+        }
+    }
+}
