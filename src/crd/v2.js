@@ -22,9 +22,9 @@ exports.read = function (buffer) {
     for (i = 0; i < fieldNumber; i++) {
         const field = fields[i];
         if (field.length === 1) {
-            crd.fields[field.name] = new field.type.constructor(field.length * dataLength);
+            crd.createField(field.name, field.type.constructor, dataLength, field.generalType);
         } else {
-            crd.fields[field.name] = new Array(dataLength);
+            crd.createField(field.name, Array, dataLength, field.generalType);
         }
     }
 

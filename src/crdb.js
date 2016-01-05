@@ -16,9 +16,18 @@ class CRDB {
         this.molecules = new Array(length);
         this.index = new Uint32Array(length * 16);
         this.fields = {};
+        this.fieldTypes = {};
 
         this._currentIndex = -1;
         this._searcher = null;
+    }
+
+    createField(name, constructor, length, generalType) {
+        if (generalType === undefined) {
+            generalType = 'number';
+        }
+        this.fields[name] = new constructor(length);
+        this.fieldTypes[name] = generalType;
     }
 
     setMolecule(oclid, mw) {
