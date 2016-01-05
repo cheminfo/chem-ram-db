@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/cheminfo/chem-ram-db.git"
   },
-  "author": "",
+  "author": "Michaël Zasso",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cheminfo/chem-ram-db/issues"
