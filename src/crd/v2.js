@@ -21,7 +21,7 @@ exports.read = function (buffer) {
 
     for (i = 0; i < fieldNumber; i++) {
         const field = fields[i];
-        crd.fields[field.name] = new field.constructor(field.length * dataLength);
+        crd.fields[field.name] = new field.type.constructor(field.length * dataLength);
     }
 
     for (i = 0; i < dataLength; i++) {
@@ -34,7 +34,7 @@ exports.read = function (buffer) {
         crd.fields.mw[i] = mw;
         crd.setMolecule(oclid, mw);
         for (var j = 0; j < fieldNumber; j++) {
-            crd.fields[fields[j].name][i * fields[j].length] = readData(buffer, fields[j].type);
+            crd.fields[fields[j].name][i * fields[j].length] = fields[j].type.read(buffer);
         }
     }
 
@@ -43,18 +43,8 @@ exports.read = function (buffer) {
 
 function readField(buffer) {
     return {
-        type: types.list[buffer.readUint8()],
+        type: types.get(buffer.readUint8()),
         length: buffer.readUint8(),
         name: buffer.readChars(buffer.readUint8())
     };
-}
-
-function readData(buffer, type) {
-    if (type === 'uint32') {
-        return buffer.readUint32();
-    } else if (type === 'float32') {
-        return buffer.readFloat32();
-    } else {
-        throw 'unimplemented';
-    }
 }

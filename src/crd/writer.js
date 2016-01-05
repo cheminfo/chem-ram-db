@@ -4,7 +4,6 @@ const IOBuffer = require('iobuffer');
 const Molecule = require('openchemlib').Molecule;
 const types = require('./types');
 const defaultFields = require('./writerDefaultFields');
-const writeData = require('./writeData');
 
 const VERSION = require('./v2').VERSION;
 
@@ -114,7 +113,24 @@ class CrdWriter extends IOBuffer {
         if (this._writtenFields.size === this.fields.length) {
             // actually write field data in the record
             for (const field of this.fields) {
-                writeData(this, field, this._writtenFields.get(field.name));
+                const write = field.type.write;
+                const value = this._writtenFields.get(field.name);
+                switch (field.length) {
+                    case 0:
+                        this.writeUint16(value.length);
+                        for (var i = 0; i < value.length; i++) {
+                            write(this, value[i]);
+                        }
+                        break;
+                    case 1:
+                        write(this, value);
+                        break;
+                    default:
+                        for (var i = 0; i < field.length; i++) {
+                            write(this, value[i]);
+                        }
+                        break;
+                }
             }
             this._writtenFields.clear();
             this._writtenMolecule = false;
@@ -129,7 +145,7 @@ class CrdWriter extends IOBuffer {
     }
 
     writeFieldDefinition(field) {
-        this.writeUint8(types.byName[field.type]);
+        this.writeUint8(field.type.id);
         this.writeUint8(field.length);
         this.writeUint8(field.name.length);
         this.writeChars(field.name);
@@ -148,12 +164,17 @@ module.exports = CrdWriter;
 function validateFields(fields) {
     for (var i = 0; i < fields.length; i++) {
         const field = fields[i];
-        if (!types.exists(field.type)) {
-            throw new Error(`field type ${field.type} does not exist`);
+        let type = field.type;
+        if (type == null)  {
+            throw new Error('missing field type');
         }
-        if (typeof field.type === 'number') {
-            field.type = types.list[field.type];
+        if (typeof type !== 'object') {
+            type = types.get(field.type);
+            if (!type) {
+                throw new Error(`field type ${field.type} does not exist`);
+            }
         }
+        field.type = type;
         if (typeof field.length !== 'number') {
             field.length = 1;
         }
