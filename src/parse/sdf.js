@@ -1,62 +1,18 @@
 'use strict';
 
-const CRD_VERSION = require('../crd/v1').VERSION;
-
+const Writer = require('../crd/writer');
 const sdfStream = require('./SDFStream');
-const IOBuffer = require('iobuffer');
-const Molecule = require('openchemlib').Molecule;
-
+var a = 0;
 module.exports = function parseSDF(stream, options) {
     return new Promise((resolve, reject) => {
-        let wantTSV = !!options.tsv;
-        let id = options.id;
-        let getID = id;
-        if (typeof id === 'string') {
-            getID = function (mol) {
-                return mol[id];
-            };
-        }
-        const tsv = [];
-        const crd = new IOBuffer();
-        crd.writeUint16(CRD_VERSION);
-        crd.skip(4); // we will put the size here but it is currently unknown
-        let total = 0;
+        const crd = new Writer();
         stream = stream.pipe(sdfStream());
         stream.on('data', function (mol) {
-            total++;
-            const id = getID(mol);
-            const molecule = Molecule.fromMolfile(mol.molfile.value);
-            const oclid = molecule.getIDCode();
-            if (wantTSV) tsv.push(oclid + '\t' + id);
-            crd.writeUint32(id);
-            crd.writeUint16(oclid.length);
-            crd.writeChars(oclid);
-            // Index
-            const index = molecule.getIndex();
-            for (var i = 0; i < 16; i++) {
-                crd.writeUint32(index[i]);
-            }
-            // MF
-            const mf = molecule.getMolecularFormula();
-            crd.writeFloat32(mf.getAbsoluteWeight());
-            crd.writeFloat32(mf.getRelativeWeight());
-            // Props
-            const props = molecule.getProperties();
-            crd.writeFloat32(props.getLogP());
-            crd.writeFloat32(props.getLogS());
-            crd.writeFloat32(props.getPolarSurfaceArea());
-            crd.writeUint32(props.getAcceptorCount());
-            crd.writeUint32(props.getDonorCount());
-            crd.writeUint32(props.getRotatableBondCount());
-            crd.writeUint32(props.getStereoCenterCount());
+            console.log(a++);
+            crd.writeMolfile(mol.molfile.value);
         });
         stream.on('end', function () {
-            crd.mark(); // todo hack because of https://github.com/image-js/iobuffer/issues/4
-            crd.seek(2); // go back to beginning and write number of entries
-            crd.writeUint32(total);
-            crd.reset();
             resolve({
-                tsv: tsv.join('\n'),
                 crd: crd.toArray()
             });
         });

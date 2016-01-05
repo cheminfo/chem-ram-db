@@ -1,6 +1,6 @@
 'use strict';
 
-const types = [
+const types = exports.list = [
     null,
     'uint8', 'uint16', 'uint32',
     'int8', 'int16', 'int32',
