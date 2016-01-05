@@ -27,7 +27,7 @@ exports.read = function (buffer) {
             crd.index[i * 16 + j] = buffer.readUint32();
         }
         crd.fields.id[i] = id;
-        crd.createField('em', buffer.readFloat32, ))
+        crd.fields.em[i] = buffer.readFloat32();
         const mw = buffer.readFloat32();
         crd.fields.mw[i] = mw;
         crd.setMolecule(oclid, mw);
