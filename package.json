@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/cheminfo/chem-ram-db#readme",
   "dependencies": {
-    "cheminfo-tools": "^1.3.4",
     "commander": "^2.9.0",
     "iobuffer": "^2.0.0",
     "openchemlib": "^3.2.4",
