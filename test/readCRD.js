@@ -5,7 +5,7 @@ const readCRD = require('..').readCRD;
 const comp = require('..').comparators;
 const Molecule = require('openchemlib').Molecule;
 
-const data = fs.readFileSync('data/chembl_20_mini.crd');
+const data = fs.readFileSync('data/chembl_20_nano.crd');
 
 
 console.time('load');

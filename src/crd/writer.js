@@ -129,7 +129,7 @@ class CrdWriter extends IOBuffer {
     }
 
     writeFieldDefinition(field) {
-        this.writeUint8(field.type);
+        this.writeUint8(types.byName[field.type]);
         this.writeUint8(field.length);
         this.writeUint8(field.name.length);
         this.writeChars(field.name);
