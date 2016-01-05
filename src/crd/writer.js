@@ -64,16 +64,13 @@ class CrdWriter extends IOBuffer {
             this.writeUint32(index[i]);
         }
 
+        const mf = molecule.getMolecularFormula();
+        this.writeFloat32(mf.getRelativeWeight());
+
         this._writtenMolecule = true;
 
-        if (this.chosenDefaults.em || this.chosenDefaults.mw) {
-            const mf = molecule.getMolecularFormula();
-            if (this.chosenDefaults.em) {
-                this.writeField('em', mf.getAbsoluteWeight());
-            }
-            if (this.chosenDefaults.mw) {
-                this.writeField('mw', mf.getRelativeWeight());
-            }
+        if (this.chosenDefaults.em) {
+            this.writeField('em', mf.getAbsoluteWeight());
         }
 
         const props = molecule.getProperties();

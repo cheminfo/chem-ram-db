@@ -9,11 +9,6 @@ module.exports = [
         length: 1
     },
     {
-        name: 'mw',
-        type: types.float32,
-        length: 1
-    },
-    {
         name: 'logp',
         type: types.float32,
         length: 1

@@ -1,24 +1,26 @@
 # chem-ram-db
 
-## CRD format, version 1
+## CRD format, version 2
 
-### Header
+### Structure
 
-* Uint16: version of the format
-* Uint32: number of entries
+* Uint16: version of the format (2)
+* Uint16: number of custom fields
+* Field definitions
+* Uint32: number of records
+* Records
 
-### Entry
+## Field definition
 
-* Uint32: molecule ID in the database
+* Uint8: data type
+* Uint8: length in record (0 = variable length)
+* Uint8: label length
+* ASCII: label
+
+## Record
+
 * Uint16: length of oclID (n)
 * Uint8[n]: oclID
 * Uint32[16]: index
-* Float32: absolute weight
 * Float32: relative weight
-* Float32: logP
-* Float32: logS
-* Float32: PSA
-* Uint32: acceptor count
-* Uint32: donor count
-* Uint32: rotatable bond count
-* Uint32: stereo center count
+* Custom fields
