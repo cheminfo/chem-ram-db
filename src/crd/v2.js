@@ -17,11 +17,15 @@ exports.read = function (buffer) {
     const dataLength = buffer.readUint32();
     const crd = new CRDB(dataLength);
 
-    crd.fields['mw'] = new Float32Array(dataLength);
+    crd.fields.mw = new Float32Array(dataLength);
 
     for (i = 0; i < fieldNumber; i++) {
         const field = fields[i];
-        crd.fields[field.name] = new field.type.constructor(field.length * dataLength);
+        if (field.length === 1) {
+            crd.fields[field.name] = new field.type.constructor(field.length * dataLength);
+        } else {
+            crd.fields[field.name] = new Array(dataLength);
+        }
     }
 
     for (i = 0; i < dataLength; i++) {
@@ -34,7 +38,21 @@ exports.read = function (buffer) {
         crd.fields.mw[i] = mw;
         crd.setMolecule(oclid, mw);
         for (var j = 0; j < fieldNumber; j++) {
-            crd.fields[fields[j].name][i * fields[j].length] = fields[j].type.read(buffer);
+            const field = fields[j];
+            if (field.length === 1) {
+                crd.fields[field.name][i] = field.type.read(buffer);
+            } else {
+                const length = field.length || buffer.readUint16();
+                if (field.type.readMulti) {
+                    crd.fields[field.name][i] = field.type.readMulti(buffer, length);
+                } else {
+                    const result = new field.type.constructor(length);
+                    for (var k = 0; k < length; k++) {
+                        result[k] = field.type.read(buffer);
+                    }
+                    crd.fields[field.name][i] = result;
+                }
+            }
         }
     }
 

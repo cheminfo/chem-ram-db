@@ -10,13 +10,14 @@ const types = [
     [6, 'int32', Int32Array, b => b.readInt32(), (b, v) => b.writeInt32(v)],
     [7, 'float32', Float32Array, b => b.readFloat32(), (b, v) => b.writeFloat32(v)],
     [8, 'float64', Float64Array, b => b.readFloat64(), (b, v) => b.writeFloat64(v)],
-    [9, 'ascii', Array, b => b.readChar(), (b, v) => b.writeChar(v)]
+    [9, 'ascii', Array, b => b.readChar(), (b, v) => b.writeChar(v), (b, n) => b.readChars(n)]
 ].map(t => ({
     id: t[0],
     name: t[1],
     constructor: t[2],
     read: t[3],
-    write: t[4]
+    write: t[4],
+    readMulti: t[5]
 }));
 
 const byName = {};
