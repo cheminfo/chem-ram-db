@@ -17,7 +17,7 @@ const types = [
     constructor: t[2],
     read: t[3],
     write: t[4],
-    generalType: t[5]
+    generalType: t[5],
     readMulti: t[6]
 }));
 
