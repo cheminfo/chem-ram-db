@@ -176,7 +176,11 @@ function validateFields(fields) {
         }
         field.type = type;
         if (typeof field.length !== 'number') {
-            field.length = 1;
+            if (field.type.name === 'ascii') {
+                field.length = 0;
+            } else {
+                field.length = 1;
+            }
         }
         if (field.length < 0 || field.length > 255) {
             throw new Error('field length must be a number in the range 0-255');
