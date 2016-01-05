@@ -19,7 +19,11 @@ module.exports = function parseSDF(stream, options) {
         stream.on('data', function (mol) {
             crd.writeMolfile(mol.molfile.value);
             for (var i = 0; i < fields.length; i++) {
-                crd.writeField(fields[i].name, mol[fields[i].name]);
+                var value = mol[fields[i].name];
+                if (fields[i].parse) {
+                    value = fields[i].parse(value);
+                }
+                crd.writeField(fields[i].name, value);
             }
         });
         stream.on('end', function () {

@@ -12,7 +12,10 @@ parseSDF(stream, {
     customFields: [
         {
             type: 'uint32',
-            name: 'chembl_id'
+            name: 'chembl_id',
+            parse: function (id) {
+                return Number(id.substring(6))
+            }
         }
     ]
 }).then(function (result) {
