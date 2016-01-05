@@ -23,6 +23,7 @@ module.exports = function parseSDF(stream, options) {
             }
         });
         stream.on('end', function () {
+            crd.finish();
             resolve({
                 crd: crd.toArray()
             });

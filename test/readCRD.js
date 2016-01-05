@@ -12,9 +12,9 @@ console.time('load');
 var crd = readCRD(data);
 console.timeEnd('load');
 
-//console.log('length', crd.length);
-//console.log(crd.molecules[0]);
-//console.log(crd.molecules[1]);
+console.log('length', crd.length);
+console.log(crd.molecules[0]);
+console.log(crd.molecules[1]);
 
 //var numSearch = [
 //    {
