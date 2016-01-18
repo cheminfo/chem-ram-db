@@ -1,5 +1,9 @@
 # chem-ram-db
 
+## Allowed types
+
+`uint8`, `uint16`, `uint32`, `int8`, `int16`, `int32`, `float32`, `float64`, `ascii`
+
 ## CRD format, version 2
 
 ### Structure
@@ -13,7 +17,7 @@
 ## Field definition
 
 * Uint8: data type
-* Uint8: length in record (0 = variable length)
+* Uint8: length in record (0 = variable length, 1 = single value, n>1 = array of n values)
 * Uint8: label length
 * ASCII: label
 
