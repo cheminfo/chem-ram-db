@@ -24,7 +24,7 @@
     "commander": "^2.9.0",
     "iobuffer": "^2.0.0",
     "openchemlib": "^3.2.4",
-    "sdf-parser": "^1.0.0",
+    "sdf-parser": "^2.0.1",
     "timsort": "^0.2.1"
   },
   "devDependencies": {
